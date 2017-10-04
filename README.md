@@ -1,4 +1,4 @@
- >>> Forked to add aditional buttons/etc. <<<
+ > Forked to add aditional buttons/etc.
 
 # Analog-E-Brake
 Designed by - AMSTUDIO
