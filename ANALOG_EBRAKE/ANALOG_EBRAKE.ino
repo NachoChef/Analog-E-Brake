@@ -53,8 +53,8 @@ void loop()
             btn_state[i] = LOW;
           else
             btn_state[i] = HIGH;
-
-          time = millis();   
+          
+          time = millis();   // oops this may not go here
           Joystick.sendState(btn_state[i]);
       }
    }
