@@ -13,32 +13,50 @@
 #include <Joystick.h>
 
 const int eBrakePin = A0;
-const int btn1 = 2;
-int btn1_state = HIGH;
-int btn1_read;
-int previous = LOW;
+
+// 2, 3, 4, 5, 6, 7, 8, 9, 10, 14, 15, 16 are available digital pins
+// just enter the pins you're using below and everything else is automatic
+int myPins[] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 14, 15, 16};
+const int numPins = sizeof(myPins);
+int btn_state[numPins];
+int btn_read[numPins];
+int previous_state[numPins];
+
+// this is to prevent multiple triggering for one press
 long time = 0;
 long debounce = 200;
 
 void setup()
 {
    pinMode(eBrakePin, INPUT); 
-   pinMode(btn1, PULL_UP);
    Joystick.begin();
+   int i;
+   for (i = 0; i < numPins; i++)
+   {
+      pinMode(myPins[i], PULL_UP);
+      btn_state[i] = LOW;
+      previous_state[i] = HIGH;
+   }
 }
 
 void loop()
 {
    // digital logic
-   btn1_read = digitalRead(btn1);
-   if (btn1_read == HIGH && previous == LOW && millis() - time > debounce) {
-       if (state == HIGH)
-         state = LOW;
-       else
-         state = HIGH;
+   int i;
+   for(int i = 0; i < numPins; i++)
+   {
+      btn_read[i] = digitalRead(myPins[i]);
+   
+      if (btn_read[i] == HIGH && previous[i] == LOW && millis() - time > debounce)
+      {
+          if (btn_state[i] == HIGH)
+            btn_state[i] = LOW;
+          else
+            btn_state[i] = HIGH;
 
-       time = millis();   
-       Joystick.sendState(btn1_state);
+          time = millis();   
+          Joystick.sendState(btn_state[i]);
+      }
    }
    
    // analog logic
