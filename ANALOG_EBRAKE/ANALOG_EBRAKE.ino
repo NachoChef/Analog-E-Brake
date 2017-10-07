@@ -23,13 +23,13 @@ int btn_read[numPins];
 int previous_state[numPins];
 
 // this is to prevent multiple triggering for one press
-long time = 0;
-long debounce = 200;
+// long time = 0;
+// long debounce = 200;
 
 void setup()
 {
    pinMode(eBrakePin, INPUT); 
-   Joystick.begin();
+   
    int i;
    for (i = 0; i < numPins; i++)
    {
@@ -37,6 +37,7 @@ void setup()
       btn_state[i] = LOW;
       previous_state[i] = HIGH;
    }
+   Joystick.begin();
 }
 
 void loop()
@@ -47,21 +48,22 @@ void loop()
    {
       btn_read[i] = digitalRead(myPins[i]);
    
-      if (btn_read[i] == HIGH && previous[i] == LOW && millis() - time > debounce)
+      
+      // if (btn_read[i] == HIGH && previous[i] == LOW)
+      if (btn_read[i] != previous_state[i])
       {
           if (btn_state[i] == HIGH)
             btn_state[i] = LOW;
           else
             btn_state[i] = HIGH;
-          
-          time = millis();   // oops this may not go here
-          Joystick.sendState(btn_state[i]);
+         
+          Joystick.setButton(myPins[i], btn_state[i]);
       }
    }
    
    // analog logic
    int pot = analogRead(A0);
-   int mapped = map(pot,0,600,0,255); //600 cause my axis only travels slightly past halfway.
+   int mapped = map(pot,0,615,0,255); //615 cause my axis only travels slightly past halfway.
    {
       Joystick.setThrottle(mapped);
    }
