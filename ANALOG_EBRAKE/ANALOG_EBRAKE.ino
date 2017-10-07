@@ -7,24 +7,19 @@
 
 // NachoChef 10/5/2017
 // Adding additional support for more buttons. More buttons = more juice.
-// Additional button code based off the `Arduino - Switch` example.
+// Additional button code based off the `Arduino - Switch` and `JoystickButton` library example.
 
-// todo - Wire buttons, create array, get more juice.
 #include <Joystick.h>
 
 const int eBrakePin = A0;
 
 // 2, 3, 4, 5, 6, 7, 8, 9, 10, 14, 15, 16 are available digital pins
 // just enter the pins you're using below and everything else is automatic
+// note this probably isn't the most efficient way to do anything
 int myPins[] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 14, 15, 16};
-const int numPins = sizeof(myPins);
+const int numPins = sizeof(myPins)/sizeof(int);
 int btn_state[numPins];
-int btn_read[numPins];
 int previous_state[numPins];
-
-// this is to prevent multiple triggering for one press
-// long time = 0;
-// long debounce = 200;
 
 void setup()
 {
@@ -33,7 +28,7 @@ void setup()
    int i;
    for (i = 0; i < numPins; i++)
    {
-      pinMode(myPins[i], PULL_UP);
+      pinMode(myPins[i], INPUT_PULLUP);
       btn_state[i] = LOW;
       previous_state[i] = HIGH;
    }
@@ -44,20 +39,14 @@ void loop()
 {
    // digital logic
    int i;
-   for(int i = 0; i < numPins; i++)
+   for(i = 0; i < numPins; i++)
    {
-      btn_read[i] = digitalRead(myPins[i]);
+      btn_state[i] = digitalRead(myPins[i]);
    
-      
-      // if (btn_read[i] == HIGH && previous[i] == LOW)
-      if (btn_read[i] != previous_state[i])
+      if (btn_state[i] != previous_state[i])
       {
-          if (btn_state[i] == HIGH)
-            btn_state[i] = LOW;
-          else
-            btn_state[i] = HIGH;
-         
           Joystick.setButton(myPins[i], btn_state[i]);
+          previous_state[i] = btn_state[i];
       }
    }
    
@@ -67,4 +56,6 @@ void loop()
    {
       Joystick.setThrottle(mapped);
    }
+
+   delay(50);
 }
