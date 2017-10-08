@@ -1,4 +1,10 @@
- > Forked to add aditional buttons/etc.
+ # Forked to add aditional buttons/etc.  
+Forked to add support for additional buttons.  
+Enter the (digital) pin numbers you're using for your buttons in the myPins array and the code will take care of the rest.  
+If your OS is showing the buttons always activated, make sure you're using a high enough resistance for the pullup resistor.  
+(I used 10k.)  
+
+Confirmed working on Windows 7.
 
 # Analog-E-Brake
 Designed by - AMSTUDIO
