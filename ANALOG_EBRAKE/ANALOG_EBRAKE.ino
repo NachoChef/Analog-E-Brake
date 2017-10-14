@@ -53,7 +53,7 @@ void loop()
    
    // analog logic
    int pot = analogRead(A0);
-   int mapped = map(pot,0,615,0,255); //615 cause my axis only travels slightly past halfway.
+   int mapped = map(pot,0,1023,0,255); // you can adjust 1024 to however far your axis actually travels if it isn't full range
    {
       Joystick.setThrottle(mapped);
    }
