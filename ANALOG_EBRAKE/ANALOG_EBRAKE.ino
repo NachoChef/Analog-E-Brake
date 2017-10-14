@@ -58,5 +58,5 @@ void loop()
       Joystick.setThrottle(mapped);
    }
 
-   delay(50);
+   delay(50);                          // this could probably be removed if you don't experience any multi-triggering
 }
