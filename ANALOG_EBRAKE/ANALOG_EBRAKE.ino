@@ -10,53 +10,61 @@
 // Additional button code based off the `Arduino - Switch` and `JoystickButton` library example.
 // Verified working on Windows 7, wired with a separate 10k pullup resistor on each pin.
 
+// 10/26/2017
+// Implemented the Bounce2 library for proper debouncing
+// I'd like to note I'm not doing a typical array for the buttons in the search for low latency
+// and it probably doesn't make much of a difference. Additionally leaving analog pins open for
+// a future idea.
+
 #include <Joystick.h>
+#include <Bounce2.h>
 
 const int eBrakePin = A0;
 
-// 2, 3, 4, 5, 6, 7, 8, 9, 10, 14, 15, 16 are available digital pins
+// 2, 3, 4, 5, 6, 7, 8, 9, 10, 14, 15, 16 are available 'strictly digital' pins
 // just enter the pins you're using below and everything else is automatic
-// note this probably isn't the most efficient way to do anything
+// note this probably isn't the most efficient way to do anything :)
+// but I'm going for low latency rather than more buttons
+
 int myPins[] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 14, 15, 16};
+
+
+// The rest of the code is 'automatic'
 const int numPins = sizeof(myPins)/sizeof(int);
-int btn_state[numPins];
-int previous_state[numPins];
+Bounce debouncing[numPins];
 
 void setup()
 {
+   // setting up the analog pin
    pinMode(eBrakePin, INPUT); 
-   
+
+
+   // setting up the digital pins with debouncing
    int i;
    for (i = 0; i < numPins; i++)
    {
       pinMode(myPins[i], INPUT_PULLUP);
-      btn_state[i] = LOW;
-      previous_state[i] = HIGH;
+      debouncing[i] = Bounce();
+      debouncing[i].attach(myPins[i]);
+      debouncing[i].interval(5);
    }
    Joystick.begin();
 }
 
 void loop()
 {
-   // digital logic
+   // reading and transmitting digital pin states with debouncing
    int i;
    for(i = 0; i < numPins; i++)
    {
-      btn_state[i] = digitalRead(myPins[i]);
-   
-      if (btn_state[i] != previous_state[i])
-      {
-          Joystick.setButton(myPins[i], btn_state[i]);
-          previous_state[i] = btn_state[i];
-      }
+      debouncing[i].update();
+      Joystick.setButton(myPins[i], debouncing[i].read());
    }
    
    // analog logic
-   int pot = analogRead(A0);
-   int mapped = map(pot,0,1023,0,255); // you can adjust 1023 to however far your axis actually travels if it isn't full range
+   //int pot = analogRead(A0);
+   //int mapped = map(pot,0,1023,0,255); // you can adjust `1023` to however far your axis actually travels if it isn't full range
    {
-      Joystick.setThrottle(mapped);
+      Joystick.setThrottle(map(analogRead(A0),0,1023,0,255));
    }
-
-   delay(50);                          // this could probably be removed if you don't experience any multi-triggering
 }
